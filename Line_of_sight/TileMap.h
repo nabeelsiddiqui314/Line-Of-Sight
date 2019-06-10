@@ -13,6 +13,7 @@ public:
 public:
 	TileMap(int rows, int columns, int cellSize);
 public:
+	void clear();
 	void setCellColor(const Pos& pos, const sf::Color& color);
 	void render(sf::RenderWindow& window);
 private:

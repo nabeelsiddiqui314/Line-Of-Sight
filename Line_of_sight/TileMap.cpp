@@ -17,10 +17,14 @@ TileMap::TileMap(int rows, int columns, int cellSize)
 			m_verticies[index + 2].position = {pos.x + cellSize, pos.y + cellSize};
 			m_verticies[index + 3].position = {pos.x, pos.y + cellSize};
 
-			for (std::size_t i = 0; i < 4; i++) {
-				m_verticies[index + i].color = sf::Color::White;
-			}
+			this->clear();
 		}
+	}
+}
+
+void TileMap::clear() { 
+	for (std::size_t i = 0; i < m_verticies.getVertexCount(); i++) {
+		m_verticies[i].color = sf::Color::White;
 	}
 }
 
