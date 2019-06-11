@@ -16,8 +16,11 @@ public:
 	void clear();
 	void setCellColor(const Pos& pos, const sf::Color& color);
 	void render(sf::RenderWindow& window);
+
+	const sf::Color& getCellColor(const Pos& pos) const;
 private:
 	sf::VertexArray m_verticies;
+	int m_rows;
 	int m_columns;
 };
 

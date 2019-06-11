@@ -3,12 +3,14 @@
 
 
 TileMap::TileMap(int rows, int columns, int cellSize) 
-	: m_columns(columns) {
+	: 
+	m_rows(rows),
+	m_columns(columns) {
 	m_verticies.setPrimitiveType(sf::Quads);
 	m_verticies.resize(rows * columns * 4);
 
-	for (std::size_t x = 0; x < columns; x++) {
-		for (std::size_t y = 0; y < rows; y++) {
+	for (int x = 0; x < columns; x++) {
+		for (int y = 0; y < rows; y++) {
 			std::size_t index = (x + y * columns) * 4;
 			sf::Vector2f pos(x * cellSize, y * cellSize);
 
@@ -36,4 +38,8 @@ void TileMap::setCellColor(const Pos& pos, const sf::Color& color) {
 
 void TileMap::render(sf::RenderWindow& window) {
 	window.draw(m_verticies);
+}
+
+const sf::Color& TileMap::getCellColor(const Pos& pos) const {
+	return m_verticies[(pos.x + pos.y * m_columns) * 4].color;
 }
