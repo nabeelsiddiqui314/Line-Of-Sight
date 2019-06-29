@@ -18,6 +18,7 @@ public:
 	void render(sf::RenderWindow& window);
 private:
 	void tileToPolygonAlgorithm();
+	void LOSAlgorithm(const sf::RenderWindow& window);
 private:
 	int m_rows;
 	int m_columns;
@@ -26,5 +27,6 @@ private:
 	std::unique_ptr<Cell[]> m_cells;
 	std::vector<Wall> m_walls;
 	sf::VertexArray m_wallLines;
+	sf::VertexArray m_light;
 	bool m_didClick = false;
 };

@@ -5,10 +5,17 @@ class TileMap
 {
 public:
 	struct Pos {
-		int x, y;
+		float x, y;
 
 		Pos() = default;
-		Pos(int x_, int y_) : x(x_), y(y_) {}
+		Pos(float x_, float y_) : x(x_), y(y_) {}
+
+		bool operator==(const TileMap::Pos& other) const {
+			return other.x == x && other.y == y;
+		}
+		 operator sf::Vector2f() const {
+			 return {x, y};
+		}
 	};
 public:
 	TileMap(int rows, int columns, int cellSize);
