@@ -48,8 +48,8 @@ void Application::update(const sf::RenderWindow& window) {
 
 void Application::render(sf::RenderWindow& window) {
 	m_tileMap.render(window);
-	window.draw(m_wallLines);
 	window.draw(m_light);
+	window.draw(m_wallLines);
 }
 
 void Application::tileToPolygonAlgorithm() {
@@ -125,18 +125,6 @@ void Application::tileToPolygonAlgorithm() {
 }
 
 void Application::LOSAlgorithm(const sf::RenderWindow& window) {
-	std::vector<TileMap::Pos> points;
-	for (std::size_t i = 0; i < m_walls.size(); i++) {
-		points.emplace_back(m_walls[i].first);
-		points.emplace_back(m_walls[i].second);
-	}
-
-	//remove duplicates
-	std::sort(points.begin(), points.end(), [&](const TileMap::Pos& first, const TileMap::Pos& second) {
-		return first.x + first.y * m_columns < second.x + second.y * m_columns;
-	});
-	points.erase(std::unique(points.begin(), points.end()), points.end());
-
 	TileMap::Pos src = TileMap::Pos(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
 	auto castRay = [&](const TileMap::Pos& destination) {
 		std::vector<TileMap::Pos> intersectionPoints;
@@ -151,9 +139,6 @@ void Application::LOSAlgorithm(const sf::RenderWindow& window) {
 					intersectionPoints.emplace_back(src.x + tA * (destination.x - src.x), src.y + tA * (destination.y - src.y));
 				}
 			}
-			else {
-				intersectionPoints.emplace_back(destination);
-			}
 		}
 		std::sort(intersectionPoints.begin(), intersectionPoints.end(), [&](const TileMap::Pos& first, const TileMap::Pos& second) {
 			return pow(first.x - src.x, 2) + pow(first.y - src.y, 2) < pow(second.x - src.x, 2) + pow(second.y - src.y, 2);
@@ -165,8 +150,8 @@ void Application::LOSAlgorithm(const sf::RenderWindow& window) {
 
 	std::vector<std::pair<float, TileMap::Pos>> POIs;
 
-	for (std::size_t i = 0; i < points.size(); i++) {
-		TileMap::Pos poi = castRay(points[i]);
+	for (std::size_t i = 0; i < m_walls.size() * 2; i++) {
+		TileMap::Pos poi = castRay((i + 1) % 2 == 0 ? m_walls[i / 2].first : m_walls[i / 2].second);
 		float angle = atan2f(poi.y - src.y, poi.x - src.x);
 		float deviation = 0.001f;
 
