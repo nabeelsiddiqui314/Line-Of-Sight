@@ -15,13 +15,13 @@ Application::Application(int rows, int columns, int cellSize)
 	m_wallLines.setPrimitiveType(sf::PrimitiveType::Lines);
 	m_light.setPrimitiveType(sf::PrimitiveType::TriangleFan);
 
-	for (std::size_t x = 1; x < m_columns - 1 ; x++) {
-		m_tileMap.setCellColor(TileMap::Pos(x, 1), sf::Color::Green);
-		m_tileMap.setCellColor(TileMap::Pos(x, m_rows - 2), sf::Color::Green);
+	for (std::size_t x = 0; x < m_columns; x++) {
+		m_tileMap.setCellColor(TileMap::Pos(x, 0), sf::Color::Green);
+		m_tileMap.setCellColor(TileMap::Pos(x, m_rows - 1), sf::Color::Green);
 	}
-	for (std::size_t y = 1; y < m_rows - 1; y++) {
-		m_tileMap.setCellColor(TileMap::Pos(1, y), sf::Color::Green);
-		m_tileMap.setCellColor(TileMap::Pos(m_columns - 2, y), sf::Color::Green);
+	for (std::size_t y = 0; y < m_rows; y++) {
+		m_tileMap.setCellColor(TileMap::Pos(0, y), sf::Color::Green);
+		m_tileMap.setCellColor(TileMap::Pos(m_columns - 1, y), sf::Color::Green);
 	}
 }
 
@@ -62,7 +62,7 @@ void Application::tileToPolygonAlgorithm() {
 	}
 
 	auto hasObstacle = [&](const TileMap::Pos& pos) {
-		if (pos.x > 0 && pos.y > 0 && pos.x < m_columns &&  pos.y < m_rows)
+		if (pos.x >= 0 && pos.y >= 0 && pos.x < m_columns &&  pos.y < m_rows)
 			return m_tileMap.getCellColor(pos) != sf::Color::White;
 		else
 			return false;
@@ -148,7 +148,7 @@ void Application::LOSAlgorithm(const sf::RenderWindow& window) {
 		return src;
 	};
 
-	std::vector<std::pair<float, TileMap::Pos>> POIs;
+	std::vector<std::pair<float, TileMap::Pos>> destinations;
 
 	for (std::size_t i = 0; i < m_walls.size() * 2; i++) {
 		TileMap::Pos poi = castRay((i + 1) % 2 == 0 ? m_walls[i / 2].first : m_walls[i / 2].second);
@@ -158,23 +158,23 @@ void Application::LOSAlgorithm(const sf::RenderWindow& window) {
 		TileMap::Pos minusAngleRay = castRay({ src.x + 5000 * cosf(angle - deviation), src.y + 5000 * sinf(angle - deviation) });
 		TileMap::Pos plusAngleRay  = castRay({ src.x + 5000 * cosf(angle + deviation), src.y + 5000 * sinf(angle + deviation) });
 
-		POIs.emplace_back(std::make_pair(angle, poi));
-		POIs.emplace_back(std::make_pair(angle - deviation, minusAngleRay));
-		POIs.emplace_back(std::make_pair(angle + deviation, plusAngleRay));
+		destinations.emplace_back(std::make_pair(angle, poi));
+		destinations.emplace_back(std::make_pair(angle - deviation, minusAngleRay));
+		destinations.emplace_back(std::make_pair(angle + deviation, plusAngleRay));
 	}
-	std::sort(POIs.begin(), POIs.end(), [](const std::pair<float, TileMap::Pos>& left, const std::pair<float, TileMap::Pos>& right) {
+	std::sort(destinations.begin(), destinations.end(), [](const std::pair<float, TileMap::Pos>& left, const std::pair<float, TileMap::Pos>& right) {
 		return left.first < right.first;
 	});
 
-	m_light.resize(POIs.size() + 1);
-	if (POIs.size() > 0) {
+	m_light.resize(destinations.size() + 1);
+	if (destinations.size() > 0) {
 		m_light[0].position = src; // centre of fan
 		m_light[0].color = sf::Color::Yellow;
-		for (std::size_t i = 1; i < POIs.size(); i++) {
-			m_light[i].position = POIs[i].second;
+		for (std::size_t i = 1; i < destinations.size(); i++) {
+			m_light[i].position = destinations[i].second;
 			m_light[i].color = sf::Color::Yellow;
 		}
-		m_light[POIs.size()].position = m_light[1].position; //last point = the first fan point for 360 coverage
-		m_light[POIs.size()].color = sf::Color::Yellow;
+		m_light[destinations.size()].position = m_light[1].position; //last point = the first fan point for 360 coverage
+		m_light[destinations.size()].color = m_light[1].color;
 	}
 }
